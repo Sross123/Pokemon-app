@@ -4,28 +4,32 @@ import usePokemonData from "./usePokemonData";
 import { IPokemonDetails } from "@/utils/types";
 
 interface IGlobalContext {
-  fetchPokemon: (page?: number) => void;
-  fetchPokemonByName: (name: string) => void;
-  loadMore: () => void;
-  pokemonListDetails: IPokemonDetails[];
-  activePokemon?: IPokemonDetails;
-  handleChange: (e: any) => void;
   loading: boolean;
+  searchQuery: string;
+  loadMore: () => void;
+  activePokemon?: IPokemonDetails;
+  handleSearchChange: (e: any) => void;
+  pokemonListDetails: IPokemonDetails[];
+  fetchPokemonByName: (name: string) => void;
 }
 
 const defaultContext: IGlobalContext = {
-  fetchPokemon: () => {},
-  fetchPokemonByName: () => {},
+  loading: false,
+  searchQuery: "",
+  loadMore: () => {},
   pokemonListDetails: [],
   activePokemon: undefined,
-  loadMore: () => {},
-  handleChange: () => {},
-  loading: false,
+  handleSearchChange: () => {},
+  fetchPokemonByName: () => {},
 };
 
 const GlobalContext = createContext<IGlobalContext>(defaultContext);
 
-export const GlobalContextProvider = ({ children }: { children: React.ReactNode }) => {
+export const GlobalContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const pokemonData = usePokemonData();
 
   return (

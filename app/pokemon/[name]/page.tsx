@@ -136,6 +136,7 @@ function page() {
                 width={700}
                 height={700}
                 className="absolute opacity-15 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
+                priority
               />
             )}
 
@@ -144,6 +145,7 @@ function page() {
               alt="pokemon image"
               width={500}
               height={500}
+              priority
               className="relative z-10 filter drop-shadow-lg"
             />
           </div>

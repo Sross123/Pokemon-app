@@ -8,7 +8,7 @@ import { ArrowDown } from "lucide-react";
 import SearchForm from "@/components/SearchForm";
 
 const page = () => {
-  const { fetchPokemon, pokemonListDetails, loading, loadMore } = useGlobalContext();
+  const { pokemonListDetails, loading, loadMore } = useGlobalContext();
 
   if (loading) return <div>Loading...</div>;
 

@@ -7,15 +7,13 @@ const baseUrl = "https://pokeapi.co/api/v2/";
 const usePokemonData = () => {
   const [pokemonList, setPokemonList] = useState<IPokemonList[]>([]);
   const [allPokemon, setAllPokemon] = useState<IPokemonList[]>([]);
-  const [pokemonListDetails, setpokemonListDetails] = useState<
+  const [pokemonListDetails, setPokemonListDetails] = useState<
     IPokemonDetails[]
   >([]);
   const [activePokemon, setActivePokemon] = useState<IPokemonDetails>();
-  const [originalPokemonDetails, setOriginalPokemonDetails] = useState<
-    IPokemonDetails[]
-  >([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [currPage, setCurrPage] = useState<number>(1);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const fetchPokemon = async (page = 1) => {
     setLoading(true);
@@ -53,8 +51,7 @@ const usePokemonData = () => {
           return res.data;
         })
       );
-      setpokemonListDetails(detials);
-      setOriginalPokemonDetails(detials);
+      setPokemonListDetails(detials);
       setLoading(false);
     } catch (error) {
       console.log("Error fetching pokemon details", error);
@@ -62,35 +59,74 @@ const usePokemonData = () => {
   };
 
   // fetch pokemon by name
-  const fetchPokemonByName = useCallback(
-    async (name: string) => {
-      setLoading(true);
-      try {
-        const res = await axios.get(`${baseUrl}pokemon/${name}`);
-        setLoading(false);
-        setActivePokemon(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    [name]
-  );
+  const fetchPokemonByName = async (name?: string) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${baseUrl}/pokemon/${name}`);
 
-  // debounce search
-  const debounce = _.debounce((value) => {
-    fetchPokemonByName(value);
-  });
+      setLoading(false);
+      setActivePokemon(res.data);
+
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching pokemon by name", error);
+    }
+  };
 
   // handle change for search
-  const handleChange = (e: any) => {
-    const searchValue = e.target.value;
-    if (!searchValue) return;
-    debounce(searchValue);
+  const searchPokemon = async (query: string) => {
+    console.log(query, "query");
+    if (!query) {
+      setSearchQuery("");
+
+      const details = await Promise.all(
+        pokemonList.map(async (pokemon) => {
+          const res = await axios.get(pokemon.url);
+
+          return res.data;
+        })
+      );
+
+      setPokemonListDetails(details);
+      return;
+    }
+
+    setLoading(true);
+
+    const filteredPokemon = allPokemon.filter((pokemon) => {
+      return pokemon.name.toLowerCase().includes(query.toLowerCase());
+    });
+
+    try {
+      // fetch details for the filtered pokemon
+      const filtered = await Promise.all(
+        filteredPokemon.map(async (pokemon) => {
+          const res = await axios.get(pokemon.url);
+          return res.data;
+        })
+      );
+
+      setLoading(false);
+
+      setPokemonListDetails(filtered);
+    } catch (error) {
+      console.error("Error searching pokemon", error);
+    }
   };
 
   // load more
   const loadMore = () => {
     fetchPokemon(currPage + 1);
+  };
+
+  // debounce search
+  const debounceSearch = _.debounce((value) => {
+    searchPokemon(value);
+  }, 200);
+
+  const handleSearchChange = (e: any) => {
+    setSearchQuery(e);
+    // debounceSearch(e);
   };
 
   useEffect(() => {
@@ -107,9 +143,9 @@ const usePokemonData = () => {
   return {
     loading,
     loadMore,
-    handleChange,
-    fetchPokemon,
+    searchQuery,
     activePokemon,
+    handleSearchChange,
     fetchPokemonByName,
     pokemonListDetails,
   };
