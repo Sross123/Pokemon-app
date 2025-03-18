@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { IPokemonDetails, IPokemonList } from "@/utils/types";
 import axios from "axios";
 import _ from "lodash";
@@ -122,11 +122,12 @@ const usePokemonData = () => {
   // debounce search
   const debounceSearch = _.debounce((value) => {
     searchPokemon(value);
-  }, 200);
+  }, 500);
 
   const handleSearchChange = (e: any) => {
+    console.log(e, "e");
     setSearchQuery(e);
-    // debounceSearch(e);
+    debounceSearch(e);
   };
 
   useEffect(() => {

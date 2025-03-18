@@ -6,7 +6,7 @@ import { useGlobalContext } from "@/context/globalContext";
 
 function SearchForm() {
   const { searchQuery, handleSearchChange } = useGlobalContext();
-
+  
   return (
     <form className="relative w-[80%] md:w-[50%]">
       <Input
